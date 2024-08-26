@@ -9,6 +9,7 @@ public class ObjectPool : MonoBehaviour
     public int defaultCapacity = 10;
     public int maxPoolSize = 15;
     public GameObject bulletPrefab;
+    public GameObject bulletParent;
 
     public IObjectPool<GameObject> Pool { get; private set; }
 
@@ -41,6 +42,7 @@ public class ObjectPool : MonoBehaviour
     {
         GameObject poolGo = Instantiate(bulletPrefab);
         poolGo.GetComponent<Bullet>().Pool = this.Pool;
+        poolGo.transform.SetParent(bulletParent.transform, false);
         return poolGo;
     }
 
