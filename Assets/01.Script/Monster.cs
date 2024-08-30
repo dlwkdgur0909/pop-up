@@ -9,6 +9,8 @@ public class Monster : MonoBehaviour
     private NavMeshAgent agent;
     private Animator anim;
     [SerializeField] private Transform rayPosition;
+    [SerializeField] private GameObject damageParticlePrefab;
+    [SerializeField] private GameObject hitEffectPosition;
 
     [Header("Default Stat")]
     public float HP = 5f;
@@ -17,11 +19,13 @@ public class Monster : MonoBehaviour
     public float range = 5f;
 
     private bool isDeath = false;
+    private ParticlePool particlePool;
 
     void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
+        particlePool = FindObjectOfType<ParticlePool>();
     }
 
     void OnEnable()
@@ -43,7 +47,7 @@ public class Monster : MonoBehaviour
             }
         }
     }
-
+    #region TakeDamage and Death
     private void InitializeMonster()
     {
         HP = maxHP;  // HP를 초기화
@@ -74,9 +78,21 @@ public class Monster : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void TakeDamage(float dmamge)
+    public void TakeDamage(float damage)
     {
-        HP -= dmamge;
+        HP -= damage;
+        if (isDeath) return;
+        StartCoroutine(Particle());
+    }
+
+    public IEnumerator Particle()
+    {
+        GameObject particle = particlePool.GetParticle();
+        particle.transform.position = hitEffectPosition.transform.position;
+        particle.transform.rotation = Quaternion.identity;
+        particle.SetActive(true);
+        yield return new WaitForSeconds(0.5f);
+        particlePool.ReturnParticle(particle);
     }
 
     public void Respawn()
@@ -84,15 +100,15 @@ public class Monster : MonoBehaviour
         gameObject.SetActive(true);
         InitializeMonster();
     }
+    #endregion
 
-    private void Ray()
+    private void Attack()
     {
         RaycastHit hit;
         if(Physics.Raycast(rayPosition.position, transform.forward, out hit, range))
         {
-            float playerHp = hit.transform.GetComponent<Player>().HP;
+            hit.transform.GetComponent<Player>().TakeDamage(damage);
             anim.SetTrigger("Attack");
-            playerHp -= damage;
         }
     }
 }

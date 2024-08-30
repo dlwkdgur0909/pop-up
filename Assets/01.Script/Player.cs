@@ -94,11 +94,7 @@ public class Player : MonoBehaviour
                 if (monster != null)
                 {
                     monster.TakeDamage(damage);
-                    Debug.Log("TakeDamage");
                 }
-
-                // 맞은 위치에 이펙트 생성 (예: 파티클)
-                // Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
             }
         }
 
@@ -106,20 +102,25 @@ public class Player : MonoBehaviour
         flash.intensity = 0;
     }
 
-    private void OnDrawGizmos()
+    public void TakeDamage(float dmamge)
     {
-        Gizmos.color = Color.red;
-
-        for (int i = 0; i < pellets; i++)
-        {
-            // 탄환의 발사 방향을 설정 (퍼짐 효과 포함)
-            Vector3 shootDirection = cam.transform.forward + new Vector3(
-                Random.Range(-spreadAngle, spreadAngle),
-                Random.Range(-spreadAngle, spreadAngle),
-                0);
-
-            // Gizmo로 레이캐스트 경로를 시각적으로 표시
-            Gizmos.DrawRay(cam.transform.position, shootDirection * range);
-        }
+        HP -= dmamge;
     }
+
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.red;
+
+    //    for (int i = 0; i < pellets; i++)
+    //    {
+    //        // 탄환의 발사 방향을 설정 (퍼짐 효과 포함)
+    //        Vector3 shootDirection = cam.transform.forward + new Vector3(
+    //            Random.Range(-spreadAngle, spreadAngle),
+    //            Random.Range(-spreadAngle, spreadAngle),
+    //            0);
+
+    //        // Gizmo로 레이캐스트 경로를 시각적으로 표시
+    //        Gizmos.DrawRay(cam.transform.position, shootDirection * range);
+    //    }
+    //}
 }
