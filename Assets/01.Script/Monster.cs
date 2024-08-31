@@ -105,10 +105,11 @@ public class Monster : MonoBehaviour
     private void Attack()
     {
         RaycastHit hit;
-        if(Physics.Raycast(rayPosition.position, transform.forward, out hit, range))
+        if (Physics.Raycast(rayPosition.position, transform.forward, out hit, range) && hit.transform.name == "Player")
         {
-            hit.transform.GetComponent<Player>().TakeDamage(damage);
             anim.SetTrigger("Attack");
+            hit.transform.GetComponent<Player>().TakeDamage(damage);
         }
+        else return;
     }
 }

@@ -1,7 +1,6 @@
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
@@ -11,6 +10,7 @@ public class Player : MonoBehaviour
 
     [Header("Default Stat")]
     public float HP;
+    public float maxHP;
 
     [Header("ShotGun")]
     [SerializeField] private int pellets = 10;  // »êÅºÃÑÀÇ ÅºÈ¯ °³¼ö
@@ -30,6 +30,7 @@ public class Player : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        HP = maxHP;
     }
 
     private void Update()
@@ -106,6 +107,7 @@ public class Player : MonoBehaviour
     {
         HP -= dmamge;
     }
+
 
     //private void OnDrawGizmos()
     //{
