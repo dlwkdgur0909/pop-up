@@ -46,9 +46,21 @@ public class MonsterSpawner : MonoBehaviour
         // 랜덤 위치 계산
         Vector3 randomPosition = new Vector3(
             Random.Range(-spawnRange.x, spawnRange.x),
-            Random.Range(-spawnRange.y, spawnRange.y),
+            0f,  // y는 0으로 설정해 둠
             Random.Range(-spawnRange.z, spawnRange.z)
         );
+
+        // Raycast로 지형의 표면 y좌표를 계산
+        RaycastHit hit;
+        if (Physics.Raycast(randomPosition + Vector3.up * 50f, Vector3.down, out hit, 100f))
+        {
+            randomPosition.y = hit.point.y;
+        }
+        else
+        {
+            // 지형을 찾지 못한 경우, 임의의 기본 y 좌표 설정
+            randomPosition.y = 0f;
+        }
 
         monsterToSpawn.transform.position = randomPosition;
 
