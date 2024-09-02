@@ -11,6 +11,10 @@ public class Player : MonoBehaviour
     [Header("Default Stat")]
     public float HP;
     public float maxHP;
+    public float stamina = default;
+    public float maxStamina = default;
+    public float staminaRegenRate = default; //스테미너 회복 속도
+    public float sprintStaminaCost = default; //초당 소모되는 스테미너의 양
 
     [Header("ShotGun")]
     [SerializeField] private int pellets = 10;  // 산탄총의 탄환 개수
@@ -23,20 +27,29 @@ public class Player : MonoBehaviour
     float yRotate;
     float xRotate;
 
-    public float moveSpeed;
+    public float moveSpeed = 10f;
+    public float sprintSpeedMultiplier; //달릴 시 속도 배율
     [SerializeField] private Camera cam;
+    [SerializeField] private Slider staminaSlider;
 
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         HP = maxHP;
+
+        //스테미너 관리
+        stamina = maxStamina;
+        staminaSlider.maxValue = maxStamina;
+        staminaSlider.value = stamina; 
     }
 
     private void Update()
     {
         Move();
         Shot();
+        RegenerateStamina();
+        staminaSlider.value = stamina;
     }
 
     private void LateUpdate()
@@ -51,7 +64,25 @@ public class Player : MonoBehaviour
 
         Vector3 dir = new Vector3(h, 0, v).normalized;
 
-        transform.Translate(moveSpeed * Time.deltaTime * dir);
+        bool isSprinting = Input.GetKey(KeyCode.LeftShift) && stamina > 0;
+        float curSpeed = isSprinting ?  moveSpeed : moveSpeed* sprintSpeedMultiplier;
+
+        if (isSprinting)
+        {
+            stamina -= sprintStaminaCost * Time.deltaTime;
+            stamina = Mathf.Clamp(stamina, 0, maxStamina);
+        }
+
+        transform.Translate(curSpeed * Time.deltaTime * dir);
+    }
+
+    private void RegenerateStamina() //스테미너 채워주기
+    {
+        if(stamina < maxStamina && !Input.GetKey(KeyCode.LeftShift))
+        {
+            stamina += staminaRegenRate * Time.deltaTime;
+            stamina = Mathf.Clamp(stamina,0 ,maxStamina);
+        }
     }
 
     private void Rotate()
