@@ -9,6 +9,12 @@ public class Player : MonoBehaviour
     [SerializeField] private ObjectPool bulletPool;
     [SerializeField] private Light flash;
 
+    private float rotateSpeed = 2;
+    float yRotate;
+    float xRotate;
+    private float moveSpeed = 5f;
+    private float sprintSpeedMultiplier = 1.5f; //달릴 시 속도 배율
+
     [Header("Default Stat")]
     public float HP;
     public float maxHP;
@@ -23,18 +29,13 @@ public class Player : MonoBehaviour
     [SerializeField] private float range = 50f; //사거리
     [SerializeField] private float damage = 10f;
     [SerializeField] private int curAmmo;
-    [SerializeField] private int maxAmmo = 5;
     [SerializeField] private float reloadTime;
     private bool isReload = false;
+    private int availableAmmo = 0;
+    private int maxAmmo = 5;
 
-    [Header("Rotate")]
-    public float rotateSpeed;
-    float yRotate;
-    float xRotate;
-
-    private float moveSpeed = 5f;
-    private float sprintSpeedMultiplier = 1.5f; //달릴 시 속도 배율
-
+        
+    [Header("UI")]
     #region UI
     [SerializeField] private Camera cam;
     [SerializeField] private Slider staminaSlider;
@@ -48,12 +49,13 @@ public class Player : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         reloadCoolTimeImage.fillAmount = 0;
-        curAmmo = maxAmmo;
+        availableAmmo = 0;
         HP = maxHP;
 
         stamina = maxStamina;
         staminaSlider.maxValue = maxStamina;
         staminaSlider.value = stamina;
+        UpdateUI();
     }
 
     private void Update()
@@ -153,10 +155,11 @@ public class Player : MonoBehaviour
 
     private void Reload()
     {
-        if ((Input.GetKeyDown(KeyCode.R) && curAmmo < maxAmmo) || curAmmo <= 0)
+        if ((Input.GetKeyDown(KeyCode.R)) && availableAmmo > 0 && curAmmo < maxAmmo)
         {
             StartCoroutine(C_Reload());
         }
+        else if(curAmmo <= 0) StartCoroutine(C_Reload());
     }
 
     private IEnumerator C_Reload()
@@ -171,9 +174,13 @@ public class Player : MonoBehaviour
                 reloadCoolTimeImage.fillAmount = 1 - (reloadingTime / reloadTime);
                 yield return null;
             }
-            curAmmo = maxAmmo;
+
+            int ammoNeeded = maxAmmo - curAmmo;
+            int ammoToReload = Mathf.Min(ammoNeeded, availableAmmo);
+            curAmmo += ammoToReload;
+            availableAmmo -= ammoToReload;
+
             isReload = false;
-            //쿨타임 이미지 초기화
             reloadCoolTimeImage.fillAmount = 0;
         }
     }
@@ -181,7 +188,7 @@ public class Player : MonoBehaviour
     private void UpdateUI()
     {
         staminaSlider.value = stamina;
-        reloadCoolTimeText.text = $"{curAmmo}/{maxAmmo}";
+        reloadCoolTimeText.text = $"{curAmmo}/{availableAmmo}";
         HPText.text = "HP: " + HP.ToString();
     }
 
@@ -189,5 +196,14 @@ public class Player : MonoBehaviour
     {
         HP -= damage;
         HP = Mathf.Clamp(HP, 0, maxHP);
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Bullet"))
+        {
+            availableAmmo += 8;
+            Destroy(other.gameObject);
+        }
     }
 }
