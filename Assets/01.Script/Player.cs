@@ -38,6 +38,7 @@ public class Player : MonoBehaviour
     [Header("UI")]
     #region UI
     [SerializeField] private Camera cam;
+    [SerializeField] private Camera MiniMapCam;
     [SerializeField] private Slider staminaSlider;
     [SerializeField] private Image reloadCoolTimeImage;
     [SerializeField] private TMP_Text reloadCoolTimeText;
@@ -159,7 +160,7 @@ public class Player : MonoBehaviour
         {
             StartCoroutine(C_Reload());
         }
-        else if(curAmmo <= 0) StartCoroutine(C_Reload());
+        else if(curAmmo <= 0 && availableAmmo >= 1) StartCoroutine(C_Reload());
     }
 
     private IEnumerator C_Reload()
