@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4568260420906790}
   - component: {fileID: 33730199074784402}
   - component: {fileID: 23429048093195576}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Larch01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
